@@ -10,6 +10,7 @@
             - evaluate_amount
             - convert_to_pennies
             - parse_data
+            - calculate sterling
         - Initialisation
      */
 
@@ -25,8 +26,9 @@
     function init (e) {
         var parsed = parse_data(amount.value);
         var pennies = evaluate_amount(parsed);
+        var sterling = calculate_sterling(pennies);
 
-        console.log(pennies);
+        console.log(sterling);
 
         e.preventDefault(); // prevent the form from submitting data to the server
     }
@@ -102,6 +104,65 @@
         var parsed = /(£)?(\d(?:[\d.]+)?)/.exec(strip_spaces);
         
         return parsed;
+    }
+
+    function calculate_sterling (amount) {
+        var sterling = [200, 100, 50, 20, 2, 1];
+        var amounts = [0, 0, 0, 0, 0, 0];
+        var whats_left = amount;
+        var results = {};
+        var remainder, how_many;
+
+        // Calculate how many coins are needed
+        sterling.forEach(function (item, index, array) {
+            if (item <= whats_left) {
+                // What's the remainder when dividing what's left of the total amount by the current coin
+                remainder = whats_left % item;
+
+                // Calculate how many times the current coin goes into what's currently remaining from the amount
+                how_many = Math.floor(whats_left/item);
+
+                // Update the `whats_left` value so the loop can move forward
+                whats_left = remainder;
+
+                // Store how many of each sterling coin were used
+                amounts[index] = how_many;
+            }
+        });
+
+        //Create an object that will hold the results of our calculations
+        amounts.forEach(function (item, index, array) {
+            // To be used as object property key
+            var title;
+
+            // If there was a coin used then store it for the function's return value
+            if (!!item) {
+                switch (index) {
+                    case 0:
+                        title = 'two pounds';
+                        break;
+                    case 1:
+                        title = 'one pound';
+                        break;
+                    case 2:
+                        title = 'fifty pence';
+                        break;
+                    case 3:
+                        title = 'twenty pence';
+                        break;
+                    case 4:
+                        title = 'two pence';
+                        break;
+                    case 5:
+                        title = 'one pence';
+                        break;
+                }
+
+                results[title] = item;
+            }
+        });
+
+        return results;
     }
 
     form.addEventListener('submit', init, false);

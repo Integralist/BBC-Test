@@ -1,0 +1,23 @@
+<!doctype html>
+<html dir="ltr" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="author" content="Mark McDonnell" />
+        <title>BBC Test</title>
+        <link rel="stylesheet" href="Assets/Styles/main.css">
+    </head>
+    <body>
+        <!--
+        The requirements specified no server-side code.
+        If JavaScript is disabled then the form will still submit to server-side script to process the data.
+        -->
+        <form class="js-form" action="process.php" method="post">
+            <p>Please enter an amount: (e.g. 92p, &pound;2.12)</p>
+            <p><input name="amount" class="js-amount"></p>
+            <p class="js-submit"><input type="submit" value="Calculate"></p>
+        </form>
+        <script src="Assets/Scripts/curl.js"></script>
+        <script src="Assets/Scripts/app.js"></script>
+    </body>
+</html>

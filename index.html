@@ -5,18 +5,25 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="author" content="Mark McDonnell" />
         <title>BBC Test</title>
-        <link rel="stylesheet" href="Assets/Styles/main.css">
+        <link rel="stylesheet" href="Assets/Styles/layout.css">
     </head>
     <body>
-        <!--
-        The requirements specified no server-side code.
-        If JavaScript is disabled then the form will still submit to server-side script to process the data.
-        -->
-        <form id="js-widget" action="process.php" method="post">
-            <p>Please enter an amount: (e.g. 92p, &pound;2.12)</p>
-            <p><input name="amount" id="js-widget__amount" value="£6.05"></p>
-            <p><input type="submit" value="Calculate"></p>
-        </form>
+        <div class="widget">
+            <section class="container">
+                <h1 class="widget__header">Sterling Calculator</h1>
+                <form class="widget__form" action="process.php" method="post">
+                    <p>Please enter an amount: (e.g. 92p, &pound;2.12)</p>
+                    <p><input name="amount" class="inputs widget__amount"> <input type="submit" value="Calculate" class="inputs widget__submit"></p>
+                </form>
+            </section>
+        </div>
+        <section class="container results hide">
+            <p>Looks like you need the following...</p>
+            <ul class="results__list"></ul>
+        </section>
+        <section class="container error hide">
+            <p>Sorry, looks like there was a problem with the amount you provided</p>
+        </section>
         <script src="Assets/Scripts/app.js"></script>
     </body>
 </html>

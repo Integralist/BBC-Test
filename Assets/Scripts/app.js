@@ -7,16 +7,20 @@
         - Variables
         - Functions
             - init
+            - parse_data
             - evaluate_amount
             - convert_to_pennies
-            - parse_data
             - calculate sterling
+            - render
         - Initialisation
      */
 
     var doc = document; 
-    var form = doc.getElementById('js-widget');
-    var amount = doc.getElementById('js-widget__amount');
+    var form = doc.querySelector('.widget__form');
+    var amount = doc.querySelector('.widget__amount');
+    var error_container = doc.querySelector('.error');
+    var results_container = doc.querySelector('.results');
+    var results = doc.querySelector('.results__list');
 
     /*
         @description initialises the whole application
@@ -24,53 +28,37 @@
         @return {undefined} no specified return value
      */
     function init (e) {
-        var parsed = parse_data(amount.value);
-        var pennies = evaluate_amount(parsed);
-        var sterling = calculate_sterling(pennies);
+        var parsed, pennies, sterling;
 
-        console.log(sterling);
+        parsed = parse_data(amount.value);
+
+        // If `false` is returned then display an error to the user
+        if (!parsed) {
+            // `classList` API to remove the class from the element
+            error_container.classList.remove('hide');
+        }
+
+        // Otherwise continue through the application
+        else {
+            pennies = evaluate_amount(parsed);
+            sterling = calculate_sterling(pennies);
+            render(sterling); // display the results on the page
+        }
 
         e.preventDefault(); // prevent the form from submitting data to the server
-    }
-
-    function evaluate_amount (amount) {
-        var pennies;
-        
-        // If there was no £ character specified then...
-        if (!amount[1]) {
-            
-            // Check if there is a period in the value (if there is: convert amount to pennies)...
-            if (amount[2].indexOf('.') !== -1) {
-                pennies = convert_to_pennies(amount[2]);
-            } 
-
-            // Otherwise the value already appears to be specified as pennies
-            else {
-                pennies = amount[2];
-            }
-
-        }
-
-        // If there is a £ character then we know to convert to pennies
-        else {
-            pennies = convert_to_pennies(amount[2]);
-        }
-
-        return pennies;
-    }
-
-    function convert_to_pennies (amount) {
-        var pennies = Math.round(parseFloat(amount) * 100);
-
-        return pennies;
     }
 
     /*
         @description function which parses the user's data looking for numerical/decimal pattern
         @param amount {String} user input via text form field
-        @return parsed {Array} parsed user data, returns 3 item Array (index 2 is potential pound character & index 3 is match)
+        @return parsed|false {Array|Boolean} parsed user data, returns 3 item Array (index 2 is potential pound character & index 3 is match) OR false if the data fails to be parsed
      */
     function parse_data (amount) {
+        // We'll check if the value entered is either empty or an empty space (if the length is zero then it coerces to a falsey value so we convert it to true using the ! operator)
+        if (/\s+/.test(amount) || !amount.length) {
+            return false;
+        }
+
         /*
             The regex I've constructed removes leading and ending white space from around the users input
          */
@@ -106,6 +94,53 @@
         return parsed;
     }
 
+    /*
+        @description checks the amount provided and returns it as pennies
+        @param amount {Array} parsed user data, returns 3 item Array (index 2 is potential pound character & index 3 is match)
+        @return pennies {Number} the amount in pennies
+     */
+    function evaluate_amount (amount) {
+        var pennies;
+        
+        // If there was no £ character specified then...
+        if (!amount[1]) {
+            
+            // Check if there is a period in the value (if there is: convert amount to pennies)...
+            if (amount[2].indexOf('.') !== -1) {
+                pennies = convert_to_pennies(amount[2]);
+            } 
+
+            // Otherwise the value already appears to be specified as pennies
+            else {
+                pennies = amount[2];
+            }
+
+        }
+
+        // If there is a £ character then we know to convert to pennies
+        else {
+            pennies = convert_to_pennies(amount[2]);
+        }
+
+        return pennies;
+    }
+
+    /*
+        @description converts the amount to pennies
+        @param amount {String} user specified amount
+        @return pennies {Number} the amount in pennies
+     */
+    function convert_to_pennies (amount) {
+        var pennies = Math.round(parseFloat(amount) * 100);
+
+        return pennies;
+    }
+
+    /*
+        @description calculates the more efficient number of coins required to make up the specified amount
+        @param amount {Number} user specified amount converted to pennies
+        @return results {Object} the final result of the calculation (lists coins required to make up the amount)
+     */
     function calculate_sterling (amount) {
         var sterling = [200, 100, 50, 20, 2, 1];
         var amounts = [0, 0, 0, 0, 0, 0];
@@ -130,7 +165,7 @@
             }
         });
 
-        //Create an object that will hold the results of our calculations
+        // Create an Object that will hold the results of our calculations
         amounts.forEach(function (item, index, array) {
             // To be used as object property key
             var title;
@@ -139,22 +174,22 @@
             if (!!item) {
                 switch (index) {
                     case 0:
-                        title = 'two pounds';
+                        title = '£2';
                         break;
                     case 1:
-                        title = 'one pound';
+                        title = '£1';
                         break;
                     case 2:
-                        title = 'fifty pence';
+                        title = '50p';
                         break;
                     case 3:
-                        title = 'twenty pence';
+                        title = '20p';
                         break;
                     case 4:
-                        title = 'two pence';
+                        title = '2p';
                         break;
                     case 5:
-                        title = 'one pence';
+                        title = '1p';
                         break;
                 }
 
@@ -165,6 +200,30 @@
         return results;
     }
 
+    /*
+        @description constructs a DOM tree from data object provided and inserts it into the page
+        @param coins {Object} results of calculation determining the amount of coins required to make up user specified amount
+        @return {undefined} no specified return value
+     */
+    function render (coins) {
+        var list = '';
+        
+        for (prop in coins) {
+            if (coins.hasOwnProperty(prop)) {
+                list += '<li>' +  prop + ' x' + coins[prop] + '</li>';
+            }
+        }
+
+        results.innerHTML = list;
+
+        // `classList` API to remove the class from the element
+        results_container.classList.remove('hide');
+
+        // `classList` API to add the class from the element
+        error_container.classList.add('hide');
+    }
+
+    // Hijack our form's submission and process results client-side
     form.addEventListener('submit', init, false);
 
 }(this));

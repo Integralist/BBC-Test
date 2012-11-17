@@ -24,24 +24,17 @@ h1, p {
     padding: 1em;
 }
 
-/* Re-usable module that abstracts common styles (couldn't think of a better name to describe this abstraction) */
-.inputs {
-    -webkit-border-radius: 5px;
-       -moz-border-radius: 5px;
-         -o-border-radius: 5px;
-            border-radius: 5px;
+/* 
+Re-usable module that hides an element.
 
-    font-size: 0.9em;
-    line-height: 1.3em;
-    padding: 0.4em 0.7em;
-}
-
-/* Re-usable module that hides an element */
+It could have been a modifier for the `results` class (e.g. results--hide)
+But I opted to keep it as a seperate module as it's more likely to be reused if application grew in scope. 
+*/
 .hide {
     display: none;
 }
 
-/* Page theme styles... */
+/* Page specific theme styles... */
 .widget {
     background-color: #FC3;
 }
@@ -53,11 +46,24 @@ h1, p {
     text-shadow: #FFF 1px 1px 2px;
 }
 
-.widget__amount {
+.widget__input {
+    -webkit-border-radius: 5px;
+       -moz-border-radius: 5px;
+         -o-border-radius: 5px;
+            border-radius: 5px;
+
+    font-size: 0.9em;
+    line-height: 1.3em;
+    padding: 0.4em 0.7em;
+}
+
+/* widget__input applies the main <input> styling and this is a modifier of that base styling */
+.widget--amount {
     border: 1px solid #930;
 }
 
-.widget__submit {
+/* widget__input applies the main <input> styling and this is a modifier of that base styling */
+.widget--submit {
     background-color: #EEE;
     border: 0;
 }

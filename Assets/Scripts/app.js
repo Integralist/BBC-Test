@@ -17,7 +17,7 @@
 
     var doc = document; 
     var form = doc.querySelector('.widget__form');
-    var amount = doc.querySelector('.widget__amount');
+    var amount = doc.querySelector('.widget--amount');
     var error_container = doc.querySelector('.error');
     var results_container = doc.querySelector('.results');
     var results = doc.querySelector('.results__list');
@@ -54,8 +54,8 @@
         @return parsed|false {Array|Boolean} parsed user data, returns 3 item Array (index 2 is potential pound character & index 3 is match) OR false if the data fails to be parsed
      */
     function parse_data (amount) {
-        // We'll check if the value entered is either empty or an empty space (if the length is zero then it coerces to a falsey value so we convert it to true using the ! operator)
-        if (/\s+/.test(amount) || !amount.length) {
+        // We'll check if the value entered is either empty space or just no value specified (if the length is zero then it coerces to a falsey value so we convert it to true using the ! operator)
+        if (/^\s+$/.test(amount) || !amount.length) {
             return false;
         }
 
@@ -63,6 +63,11 @@
             The regex I've constructed removes leading and ending white space from around the users input
          */
         var strip_spaces = amount.replace(/^\s+|\s+$/g, '');
+
+        /*
+            The regex I've constructed replaces any commas , with a period .
+         */
+        var replace_commas = strip_spaces.replace(/,/g, '.');
 
         /*
             The next regex I've constructed parses the value like so:
@@ -89,7 +94,7 @@
             4.235p        = ["4.235", undefined, "4.235"]
             £1.257422457p = ["£1.257422457", "£", "1.257422457"]
          */
-        var parsed = /(£)?(\d(?:[\d.]+)?)/.exec(strip_spaces);
+        var parsed = /(£)?(\d(?:[\d.]+)?)/.exec(replace_commas);
         
         return parsed;
     }
